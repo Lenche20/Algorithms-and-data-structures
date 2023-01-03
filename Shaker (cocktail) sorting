@@ -1,0 +1,58 @@
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+
+public class ShakerSort {
+
+    static void shakerSort(int a[], int n) {
+        // Vasiot kod tuka
+
+        boolean swapped =true;
+        int start=0;
+        int end=n-1;
+
+        while(swapped) {
+            swapped = false;
+
+            for(int j=end; j>0; j--) {
+                if ( a[j] < a[j - 1]) {
+                    int temp = a[j];
+                    a[j] = a[j-1];
+                    a[j-1]=temp;
+                    swapped=true;
+                }
+            }
+            end--;
+            for(int p=0; p < n ; p++)
+                System.out.print(a[p]+" ");
+            System.out.println();
+            
+            for(int j = start ; j < n-1 ; j++) {
+                if ( a[j] > a[j + 1]) {
+                    int temp = a[j];
+                    a[j] = a[j+1];
+                    a[j+1]=temp;
+                    swapped=true;
+                }
+            }
+            start++;
+            for(int p=0; p < n ; p++)
+                System.out.print(a[p]+" ");
+            System.out.println();
+        }
+    }
+
+    public static void main(String[] args) throws IOException {
+        int i;
+        BufferedReader stdin = new BufferedReader( new InputStreamReader(System.in));
+        String s = stdin.readLine();
+        int n = Integer.parseInt(s);
+
+        s = stdin.readLine();
+        String [] pom = s.split(" ");
+        int [] a = new int[n];
+        for(i=0; i<n; i++)
+            a[i]=Integer.parseInt(pom[i]);
+        shakerSort(a,n);
+    }
+}
