@@ -1,0 +1,190 @@
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.Iterator;
+import java.util.NoSuchElementException;
+
+class SLLNode<E> {
+    protected E element;
+    protected SLLNode <E> succ;
+
+    public SLLNode (E e, SLLNode <E> s) {
+        element=e;
+        succ=s;
+    }
+    @Override
+    public String toString() {
+        return element.toString();
+    }
+}
+
+class SLL <E> {
+    private SLLNode<E> first;
+
+    public SLL(SLLNode<E> f) {
+        first = f;
+    }
+
+    public SLL() {
+        first = null;
+    }
+
+    public SLLNode<E> getFirst() {
+        return first;
+    }
+
+    public void insertFirst(E o) {
+        SLLNode<E> ins = new SLLNode<E>(o, first);
+        first = ins;
+    }
+
+    public void insertLast(E o) {
+        if (first == null) {
+            insertFirst(o);
+        } else {
+            SLLNode<E> pom = first;
+            while (pom.succ != null)
+                pom = pom.succ;
+            SLLNode<E> ins = new SLLNode<E>(o, null);
+            pom.succ = ins;
+        }
+    }
+
+    @Override
+    public String toString() {
+        String ret = new String();
+        if (first != null) {
+            SLLNode<E> tmp = first;
+            ret += tmp + " ";
+            while (tmp.succ != null) {
+                tmp = tmp.succ;
+                ret += tmp + " ";
+            }
+        } else
+            ret = "Prazna lista!!!";
+        return ret;
+    }
+
+    public Iterator<E> iterator() {
+        return new LRIterator<E>();
+    }
+
+//vnatresna klasa
+
+    private class LRIterator<E> implements Iterator<E> {
+        private SLLNode<E> place, prev, curr;
+
+        private LRIterator() {
+            place = (SLLNode<E>) first;
+            curr = prev = null;
+        }
+
+        public boolean hasNext() {
+            return (place != null);
+        }
+
+        public E next() {
+            if (place == null) throw new NoSuchElementException();
+            E nextElem = place.element;
+            prev = curr;
+            curr = place;
+            place = place.succ;
+            return nextElem;
+        }
+    }
+}
+
+
+//sobiranje so slevanje
+
+public class SLLJoinLists <E extends Comparable <E>> {
+
+    public SLL <E> join (SLL <E> lista1, SLL <E> lista2) {
+        SLL <E> rez=new SLL<E>();
+        SLLNode <E> node1=lista1.getFirst();
+        SLLNode <E> node2=lista2.getFirst();
+
+        //spojuvanje so slevanje na 2 podredeli listi
+        while(node1!=null&&node2!=null) {
+            if(node1.element.compareTo(node2.element)<0) {
+                rez.insertLast(node1.element);
+                node1=node1.succ;
+            } else if(node2.element.compareTo(node1.element)<0) {
+                rez.insertLast(node2.element);
+                node2=node2.succ;
+            } else if(node1.element.compareTo(node2.element)==0) {
+                node1=node1.succ;
+            } else if(node1.element.compareTo(node1.succ.element)==0)
+                node1=node1.succ;
+            else if(node2.element.compareTo(node2.succ.element)==0)
+                node2=node2.succ;
+        }
+        if(node1!=null) {
+            while (node1!=null) {
+                rez.insertLast(node1.element);
+                node1=node1.succ;
+            }
+        }
+        if(node2!=null) {
+            while(node2!=null) {
+                rez.insertLast(node2.element);
+                node2=node2.succ;
+            }
+        }
+
+        /// otstranuvanje na duplikati od podredena lista
+        SLL <E> pomLista=new SLL<E>();
+        SLLNode <E> pom=rez.getFirst();
+
+        if(pom==null)
+            pomLista.insertLast(pom.element);
+        else {
+            while(pom.succ!=null) {
+                if(pom.element.compareTo(pom.succ.element)!=0)
+                    pomLista.insertLast(pom.element);
+                pom=pom.succ;
+            }
+            if(pom!=null&&pom.succ==null)
+                pomLista.insertLast(pom.element);
+        }
+        return pomLista;
+    }
+
+    public static void main(String[] args) throws IOException {
+
+        SLL <Integer> lista1=new SLL <Integer>();
+        SLL <Integer> lista2=new SLL <Integer>();
+
+        BufferedReader stdin = new BufferedReader(new InputStreamReader(System.in));
+        String s = stdin.readLine();
+        int N = Integer.parseInt(s); //broj na jazli na prvata lista
+        s = stdin.readLine();
+        String[] pomniza = s.split(" "); //jazlite na prvata lista
+        for (int i = 0; i < N; i++) {
+            lista1.insertLast(Integer.parseInt(pomniza[i]));
+        }
+
+        s = stdin.readLine();
+        N = Integer.parseInt(s); //broj na jazli na vtorata lista
+        s = stdin.readLine();
+        pomniza = s.split(" "); //jazlite na vtorata lista
+        for (int i = 0; i < N; i++) {
+            lista2.insertLast(Integer.parseInt(pomniza[i]));
+        }
+
+        // spoeni = lista1.joinLists(lista2);
+        SLLJoinLists<Integer> joinSort = new SLLJoinLists<Integer>();
+
+        SLL <Integer>  spoeni= joinSort.join(lista1, lista2);
+
+        Iterator<Integer> it = spoeni.iterator();
+
+        while (it.hasNext()) {
+            System.out.print(it.next());
+            if(it.hasNext())
+                System.out.print(" ");
+        }
+        //System.out.println(it);
+
+    }
+}
